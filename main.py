@@ -25,6 +25,16 @@ Available commands:
   mst
       Communication network (Minimum Spanning Tree)
 
+  addnode <id> <type>
+      Add new node (types: hub, delivery, charging, relay)
+
+  addedge <from> <to> <energy_cost> <capacity> [distance] [bidirectional] [restricted]
+      Add new edge 
+      distance: optional, defaults to 0.0
+      bidirectional: optional, default false
+      restricted: optional, default false
+
+
   nofly <u> <v>
       Add no-fly zone
 
@@ -100,6 +110,48 @@ def main():
             print("Total cost:", cost)
             for u, v, w in edges:
                 print(f"{u} -- {v} ({w})")
+
+        elif cmd == "addnode" and len(parts) == 3:
+            node_id = parts[1]
+            node_type = parts[2].lower()
+            
+            if node_type not in ["hub", "delivery", "charging", "relay"]:
+                print("Invalid node type. Use: hub, delivery, charging, or relay")
+            else:
+                graph.add_node(node_id, node_type)
+                print(f"Node '{node_id}' added as type '{node_type}'")
+
+        elif cmd == "addedge" and len(parts) >= 5:
+            from_id = parts[1]
+            to_id = parts[2]
+            
+            try:
+                energy_cost = int(parts[3])
+                capacity = int(parts[4])
+                bidir = False
+                distance = float(energy_cost)
+                restricted = False
+
+                if len(parts) >= 6:
+                    distance = float(parts[5])
+                if len(parts) >= 7:
+                    bidir = parts[6].lower() == "true"
+                if len(parts) >= 8:
+                    restricted = parts[7].lower() == "true"
+                
+                graph.add_edge(
+                    from_node_id=from_id,
+                    to_node_id=to_id,
+                    energy_cost=energy_cost,
+                    capacity=capacity,
+                    bidirectional=bidir,
+                    distance=distance,
+                    restricted=restricted
+                )
+                print(f"Edge added: {from_id} -> {to_id} (energy: {energy_cost}, capacity: {capacity}, distance: {distance}, bidirectional: {bidir}, restricted: {restricted})")
+                
+            except ValueError:
+                print("Error: energy_cost and capacity must be numbers")
 
         elif cmd == "nofly" and len(parts) >= 3:
             u, v = parts[1], parts[2]
