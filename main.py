@@ -68,7 +68,7 @@ def main():
         elif cmd == "reach" and len(parts) == 2:
             hub = parts[1]
             result = reachable_from_hub(graph, hub)
-            print("All nodes reachable:", result)
+            print("All delivery nodes reachable:", result)
 
         elif cmd == "route" and len(parts) == 3:
             start, target = parts[1], parts[2]
